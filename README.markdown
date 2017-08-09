@@ -1,5 +1,5 @@
 # AWLX - Amazon Wish List Extractor
-[Latest Release] - [Documentation] - [Issues]
+[Latest Release] - [Issues]
 
 _Amazon Wish List Extractor._
 
@@ -8,9 +8,7 @@ _Amazon Wish List Extractor._
 [Issues]: https://github.com/metaist/awlx/issues
 
 ## Install
-Drag this link to your bookmark bar: [AWLX][1]
-
-[1]: javascript:(function%20(url)%20{%20var%20tag%20=%20document.createElement('script');%20tag.setAttribute('src',%20url);%20tag.setAttribute('crossorigin',%20'anonymous');%20document.body.appendChild(tag);%20}('https://cdn.rawgit.com/metaist/awlx/master/amazon-wishlist.js'));
+Create a new bookmark and set the location to the contents of [bookmarklet.js].
 
 ## Usage
 - Visit your Amazon Wishlist and click the bookmarklet.
