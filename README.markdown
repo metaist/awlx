@@ -4,11 +4,10 @@
 _Amazon Wish List Extractor._
 
 [Latest Release]: https://github.com/metaist/awlx/releases/latest
-[Documentation]: https://github.com/metaist/awlx/wiki
 [Issues]: https://github.com/metaist/awlx/issues
 
 ## Install
-Create a new bookmark and set the location to the contents of [bookmarklet.js].
+Create a new bookmark and [use the javascript](bookmarklet.js) as the location.
 
 ## Usage
 - Visit your Amazon Wishlist and click the bookmarklet.
