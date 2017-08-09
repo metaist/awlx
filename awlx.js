@@ -1,17 +1,33 @@
 ((window) => {
   'use strict';
 
-  // URL to latest minified jQuery.
-  var URL_JQUERY = 'https://code.jquery.com/jquery-3.2.1.min.js';
+  var app = { VERSION: '1.0.0-pre' };
 
   // Match the Amazon ID in a URL.
-  var REGEX_ASIN = /dp\/(.*)\//;
+  app.REGEX_ASIN = /dp\/(.*)\//;
 
-  var parseCurrency = (amount) => {
-    return parseFloat(amount.substr(1), 10) || 0
+  // URL to latest minified jQuery.
+  app.URL_JQUERY = 'https://code.jquery.com/jquery-3.2.1.min.js';
+
+  // Default configuration.
+  app.config = {
+    scrollWait: 600 // ms to wait between scrolls
   };
 
-  var scrollToBottom = () => {
+  // Initialize and run the app.
+  app.init = () => {
+    app.scroll
+    .then(app.getBooks)
+    .then(books => { return Promise.all(books.map(app.getAudible)) })
+    .then(app.renderCSV)
+    .then(console.log);
+  };
+
+  /**
+    Helper function that scrolls to the bottom of the page.
+    @return number - position of the scrollbar before scrolling (from 0 to 1)
+  */
+  app.scrollToBottom = () => {
     var maxY = Math.max(
       document.body.scrollHeight,
       document.body.offsetHeight,
@@ -26,33 +42,11 @@
     return result;
   };
 
-  getAudiblePrice = (html) => {
-    return parseCurrency(
-      $(html)
-        .find('label[for="narration-checkbox"] .a-color-price')
-        .text()
-    );
-  };
-
-  var app = {
-    version: '1.0.0',
-    config: {
-      scrollWait: 400 // ms to wait between scrolls
-    }
-  };
-
-  app.init = () => {
-    app.scroll
-    .then(app.getBooks)
-    .then(books => { return Promise.all(books.map(app.lookupAudible)) })
-    .then(app.csv)
-    .then(console.log);
-  };
-
+  // Promise that continues to scroll down until it's definitely at the bottom.
   app.scroll = new Promise((resolve, reject) => {
-    scrollToBottom();
+    app.scrollToBottom();
     var timer = window.setInterval(() => {
-      if (scrollToBottom() >= 1) {
+      if (app.scrollToBottom() >= 1) {
         window.clearInterval(timer);
         timer = false;
         resolve();
@@ -60,16 +54,28 @@
     }, app.config.scrollWait);
   });
 
+  /**
+    Convert a string containing a dollar amount into a float.
+    @param amount {string} - item to parse
+    @return {float} - dollars as a float (or zero if parsing fails)
+  */
+  app.parseCurrency = (amount) => parseFloat(amount.substr(1), 10) || 0;
+
+  /**
+    Extract the titles from the page.
+
+    @return {array[object]} - extracted book information
+  */
   app.getBooks = () => {
     return $.makeArray($('[id^="itemInfo_"]').map((idx, dom) => {
       var $dom = $(dom);
       var url = $dom.find('[id^="itemName"]').attr('href');
       var book = {
         pos: idx,
-        asin: REGEX_ASIN.exec(url)[1],
+        asin: app.REGEX_ASIN.exec(url)[1],
         name: $dom.find('[id^="itemName"]').text(),
         by: $dom.find('[id^="item-byline"]').text(),
-        price: parseCurrency($dom.find('[id^="itemPrice"]').text()),
+        price: app.parseCurrency($dom.find('[id^="itemPrice"]').text()),
         audible: '',
         url: url
       };
@@ -78,16 +84,31 @@
     }));
   };
 
-  app.lookupAudible = (book) => {
+  /**
+    Get the price of an audible book, if available.
+    @param book {object} - item to lookup
+    @return {Promise} - resolves when the page is visited
+  */
+  app.getAudible = (book) => {
     return new Promise((resolve, reject) => {
-      $.get(book.url).done(function (data) {
-        book.audible = getAudiblePrice(data);
+      $.get(book.url).done(function (html) {
+        book.audible = app.parseCurrency(
+          $(html)
+            .find('label[for="narration-checkbox"] .a-color-price')
+            .text()
+        );
+
         resolve(book);
       });
     });
   };
 
-  app.csv = (books) => {
+  /**
+    Convert an array of books into a CSV string.
+    @param books {array[object]} - items to render
+    @return {string} - CSV containing book information
+  */
+  app.renderCSV = (books) => {
     return (
       'ASIN,Title,Price,Audible,Total\n' +
       books.map(book => {
@@ -104,7 +125,7 @@
 
   if(typeof jQuery === 'undefined') {
     var tag = document.createElement('script');
-    tag.setAttribute('src', URL_JQUERY);
+    tag.setAttribute('src', app.URL_JQUERY);
     tag.setAttribute('crossorigin', 'anonymous');
     if(onload) { tag.onload = app.init; }
     document.body.appendChild(tag);
@@ -112,5 +133,5 @@
     app.init();
   }//end if: script injected
 
-  window.app = app;
+  window.awlx = app; // exposed globally
 })(window);

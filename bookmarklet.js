@@ -1,1 +1,0 @@
-javascript:(function(u){var d=document;var t=d.createElement('script');t.setAttribute('src',u);t.setAttribute('crossorigin','anonymous');d.body.appendChild(t);}('https://cdn.rawgit.com/metaist/awlx/master/awlx.js'));

@@ -14,5 +14,8 @@ javascript:(function(u){var d=document;var t=d.createElement('script');t.setAttr
 ```
 
 ## Usage
-- Visit your Amazon Wishlist and click the bookmarklet.
+- Visit your Amazon Wish list and click the bookmarklet.
 - After a while, view the result in the Developer Console.
+
+## License
+Licensed under the [MIT License](LICENSE.markdown).
