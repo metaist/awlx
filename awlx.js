@@ -1,4 +1,4 @@
-((window, $) => {
+((window) => {
   'use strict';
 
   // URL to latest minified jQuery.
@@ -112,6 +112,5 @@
     app.init();
   }//end if: script injected
 
-
   window.app = app;
-})(window, jQuery);
+})(window);
